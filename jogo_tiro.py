@@ -31,18 +31,23 @@ class Jogador(Entidade):
         super().__init__(x, y, 5)
         self.image.fill((0, 255, 0))  # verde
         self.vida = 5
+        self.direcao_atual = (0, -1)  # começa "olhando" pra cima
 
     def update(self):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_w]:
             self.mover(0, -self.velocidade)
+            self.direcao_atual = (0, -1)
         if keys[pygame.K_s]:
             self.mover(0, self.velocidade)
+            self.direcao_atual = (0, 1)
         if keys[pygame.K_a]:
             self.mover(-self.velocidade, 0)
+            self.direcao_atual = (-1, 0)
         if keys[pygame.K_d]:
             self.mover(self.velocidade, 0)
+            self.direcao_atual = (1, 0)
 
         # limites de tela
         self.rect.x = max(0, min(self.rect.x, LARGURA - 40))
@@ -51,13 +56,18 @@ class Jogador(Entidade):
 
 # TIRO (DO JOGADOR)
 class Tiro(Entidade):
-    def __init__(self, x, y):
+    def __init__(self, x, y, direcao):
         super().__init__(x, y, 10)
         self.image.fill((255, 255, 0))  # amarelo
+        self.dx, self.dy = direcao
 
     def update(self):
-        self.rect.y -= self.velocidade
-        if self.rect.y < 0:
+        self.rect.x += self.dx * self.velocidade
+        self.rect.y += self.dy * self.velocidade
+
+        # remove o tiro se sair da tela em qualquer direção
+        if (self.rect.right < 0 or self.rect.left > LARGURA or
+                self.rect.bottom < 0 or self.rect.top > ALTURA):
             self.kill()
 
 
@@ -100,6 +110,9 @@ todos_sprites.add(jogador)
 pontos = 0
 spawn_timer = 0
 
+COOLDOWN_TIRO = 15  # frames de espera entre um tiro e outro (15 frames ~ 0.25s a 60 FPS)
+tiro_timer = 0
+
 rodando = True
 while rodando:
     clock.tick(FPS)
@@ -108,11 +121,25 @@ while rodando:
         if event.type == pygame.QUIT:
             rodando = False
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                tiro = Tiro(jogador.rect.centerx, jogador.rect.y)
-                todos_sprites.add(tiro)
-                tiros.add(tiro)
+    # disparo contínuo enquanto a seta estiver pressionada, limitado pelo cooldown
+    tiro_timer += 1
+    keys = pygame.key.get_pressed()
+
+    direcao = None
+    if keys[pygame.K_UP]:
+        direcao = (0, -1)
+    elif keys[pygame.K_DOWN]:
+        direcao = (0, 1)
+    elif keys[pygame.K_LEFT]:
+        direcao = (-1, 0)
+    elif keys[pygame.K_RIGHT]:
+        direcao = (1, 0)
+
+    if direcao and tiro_timer >= COOLDOWN_TIRO:
+        tiro = Tiro(jogador.rect.centerx, jogador.rect.centery, direcao)
+        todos_sprites.add(tiro)
+        tiros.add(tiro)
+        tiro_timer = 0
 
     # timer de entrada dos inimigos
     spawn_timer += 1
@@ -140,7 +167,7 @@ while rodando:
     TELA.fill((20, 20, 20))
     todos_sprites.draw(TELA)
 
-    #Painel de pontos e vida
+    # Painel de pontos e vida
     font = pygame.font.SysFont(None, 30)
     texto = font.render(f"Vida: {jogador.vida}  |  Pontos: {pontos}", True, (255, 255, 255))
     TELA.blit(texto, (10, 10))
@@ -148,4 +175,3 @@ while rodando:
     pygame.display.flip()
 
 pygame.quit()
-
