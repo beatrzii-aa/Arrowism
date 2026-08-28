@@ -12,6 +12,25 @@ FPS = 60
 clock = pygame.time.Clock()
 
 
+def gerar_posicao_borda():
+    lado = random.choice(['cima', 'baixo', 'esquerda', 'direita'])
+
+    if lado == 'cima':
+        x = random.randint(0, LARGURA - 40)
+        y = -40
+    elif lado == 'baixo':
+        x = random.randint(0, LARGURA - 40)
+        y = ALTURA + 40
+    elif lado == 'esquerda':
+        x = -40
+        y = random.randint(0, ALTURA - 40)
+    else:  # direita
+        x = LARGURA + 40
+        y = random.randint(0, ALTURA - 40)
+
+    return x, y, lado
+
+
 # CLASSE BASE
 class Entidade(pygame.sprite.Sprite):
     def __init__(self, x, y, velocidade):
@@ -83,20 +102,38 @@ class Robo(Entidade):
 
 # ROBO EXEMPLO — ZigueZague
 class RoboZigueZague(Robo):
-    def __init__(self, x, y):
+    def __init__(self, x, y, lado):
         super().__init__(x, y, velocidade=3)
+        self.lado = lado
         self.direcao = 1
 
     def atualizar_posicao(self):
-        self.rect.y += self.velocidade
-        self.rect.x += self.direcao * 3
-
-        if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
-            self.direcao *= -1
+        if self.lado in ('cima', 'baixo'):
+            self.rect.y += self.velocidade if self.lado == 'cima' else -self.velocidade
+            self.rect.x += self.direcao * 3
+            if self.rect.x <= 0 or self.rect.x >= LARGURA - 40:
+                self.direcao *= -1
+        else:
+            self.rect.x += self.velocidade if self.lado == 'esquerda' else -self.velocidade
+            self.rect.y += self.direcao * 3
+            if self.rect.y <= 0 or self.rect.y >= ALTURA - 40:
+                self.direcao *= -1
 
     def update(self):
         self.atualizar_posicao()
-        if self.rect.y > ALTURA:
+
+        # só remove o robô quando ele sai pelo lado OPOSTO ao de entrada
+        saiu = False
+        if self.lado == 'cima' and self.rect.top > ALTURA:
+            saiu = True
+        elif self.lado == 'baixo' and self.rect.bottom < 0:
+            saiu = True
+        elif self.lado == 'esquerda' and self.rect.left > LARGURA:
+            saiu = True
+        elif self.lado == 'direita' and self.rect.right < 0:
+            saiu = True
+
+        if saiu:
             self.kill()
 
 
@@ -144,7 +181,8 @@ while rodando:
     # timer de entrada dos inimigos
     spawn_timer += 1
     if spawn_timer > 40:
-        robo = RoboZigueZague(random.randint(40, LARGURA - 40), -40)
+        x, y, lado = gerar_posicao_borda()
+        robo = RoboZigueZague(x, y, lado)
         todos_sprites.add(robo)
         inimigos.add(robo)
         spawn_timer = 0
