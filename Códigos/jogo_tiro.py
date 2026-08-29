@@ -5,8 +5,6 @@ pygame.init()
 
 LARGURA = 800
 ALTURA = 600
-TELA = pygame.display.set_mode((LARGURA, ALTURA))
-pygame.display.set_caption("Robot Defense - Template")
 
 FPS = 60
 clock = pygame.time.Clock()
@@ -137,79 +135,90 @@ class RoboZigueZague(Robo):
             self.kill()
 
 
-todos_sprites = pygame.sprite.Group()
-inimigos = pygame.sprite.Group()
-tiros = pygame.sprite.Group()
+def iniciar(tela):
+    """Roda o loop principal do jogo. Recebe a tela já criada pelo main.py
+    (o jogo_tiro não cria mais a própria janela, reaproveita a do menu)."""
 
-jogador = Jogador(LARGURA // 2, ALTURA - 60)
-todos_sprites.add(jogador)
+    todos_sprites = pygame.sprite.Group()
+    inimigos = pygame.sprite.Group()
+    tiros = pygame.sprite.Group()
 
-pontos = 0
-spawn_timer = 0
+    jogador = Jogador(LARGURA // 2, ALTURA - 60)
+    todos_sprites.add(jogador)
 
-COOLDOWN_TIRO = 15  # frames de espera entre um tiro e outro (15 frames ~ 0.25s a 60 FPS)
-tiro_timer = 0
+    pontos = 0
+    spawn_timer = 0
 
-rodando = True
-while rodando:
-    clock.tick(FPS)
+    COOLDOWN_TIRO = 15  # frames de espera entre um tiro e outro (15 frames ~ 0.25s a 60 FPS)
+    tiro_timer = 0
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            rodando = False
-
-    # disparo contínuo enquanto a seta estiver pressionada, limitado pelo cooldown
-    tiro_timer += 1
-    keys = pygame.key.get_pressed()
-
-    direcao = None
-    if keys[pygame.K_UP]:
-        direcao = (0, -1)
-    elif keys[pygame.K_DOWN]:
-        direcao = (0, 1)
-    elif keys[pygame.K_LEFT]:
-        direcao = (-1, 0)
-    elif keys[pygame.K_RIGHT]:
-        direcao = (1, 0)
-
-    if direcao and tiro_timer >= COOLDOWN_TIRO:
-        tiro = Tiro(jogador.rect.centerx, jogador.rect.centery, direcao)
-        todos_sprites.add(tiro)
-        tiros.add(tiro)
-        tiro_timer = 0
-
-    # timer de entrada dos inimigos
-    spawn_timer += 1
-    if spawn_timer > 40:
-        x, y, lado = gerar_posicao_borda()
-        robo = RoboZigueZague(x, y, lado)
-        todos_sprites.add(robo)
-        inimigos.add(robo)
-        spawn_timer = 0
-
-    # colisão tiro x robô
-    colisao = pygame.sprite.groupcollide(inimigos, tiros, True, True)
-    pontos += len(colisao)
-
-    # colisão robô x jogador
-    if pygame.sprite.spritecollide(jogador, inimigos, True):
-        jogador.vida -= 1
-        if jogador.vida <= 0:
-            print("GAME OVER!")
-            rodando = False
-
-    # atualizar
-    todos_sprites.update()
-
-    # desenhar
-    TELA.fill((20, 20, 20))
-    todos_sprites.draw(TELA)
-
-    # Painel de pontos e vida
     font = pygame.font.SysFont(None, 30)
-    texto = font.render(f"Vida: {jogador.vida}  |  Pontos: {pontos}", True, (255, 255, 255))
-    TELA.blit(texto, (10, 10))
 
-    pygame.display.flip()
+    rodando = True
+    while rodando:
+        clock.tick(FPS)
 
-pygame.quit()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                rodando = False
+
+        # disparo contínuo enquanto a seta estiver pressionada, limitado pelo cooldown
+        tiro_timer += 1
+        keys = pygame.key.get_pressed()
+
+        direcao = None
+        if keys[pygame.K_UP]:
+            direcao = (0, -1)
+        elif keys[pygame.K_DOWN]:
+            direcao = (0, 1)
+        elif keys[pygame.K_LEFT]:
+            direcao = (-1, 0)
+        elif keys[pygame.K_RIGHT]:
+            direcao = (1, 0)
+
+        if direcao and tiro_timer >= COOLDOWN_TIRO:
+            tiro = Tiro(jogador.rect.centerx, jogador.rect.centery, direcao)
+            todos_sprites.add(tiro)
+            tiros.add(tiro)
+            tiro_timer = 0
+
+        # timer de entrada dos inimigos
+        spawn_timer += 1
+        if spawn_timer > 40:
+            x, y, lado = gerar_posicao_borda()
+            robo = RoboZigueZague(x, y, lado)
+            todos_sprites.add(robo)
+            inimigos.add(robo)
+            spawn_timer = 0
+
+        # colisão tiro x robô
+        colisao = pygame.sprite.groupcollide(inimigos, tiros, True, True)
+        pontos += len(colisao)
+
+        # colisão robô x jogador
+        if pygame.sprite.spritecollide(jogador, inimigos, True):
+            jogador.vida -= 1
+            if jogador.vida <= 0:
+                print("GAME OVER!")
+                rodando = False
+
+        # atualizar
+        todos_sprites.update()
+
+        # desenhar
+        tela.fill((20, 20, 20))
+        todos_sprites.draw(tela)
+
+        # Painel de pontos e vida
+        texto = font.render(f"Vida: {jogador.vida}  |  Pontos: {pontos}", True, (255, 255, 255))
+        tela.blit(texto, (10, 10))
+
+        pygame.display.flip()
+
+
+# permite continuar testando o jogo_tiro sozinho, sem passar pelo menu
+if __name__ == "__main__":
+    tela = pygame.display.set_mode((LARGURA, ALTURA))
+    pygame.display.set_caption("Robot Defense - Template")
+    iniciar(tela)
+    pygame.quit()
