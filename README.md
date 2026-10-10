@@ -2,15 +2,11 @@
 
 **Arrowism** é um minijogo desenvolvido em **Python com Pygame**, ambientado em um mundo medieval ameaçado por uma invasão alienígena. O protagonista é um herói que precisa enfrentar inimigos, superar salas cada vez mais difíceis e derrotar um chefe final.
 
-O nome combina **Arrow** (*flecha*), sua arma principal, com **Heroism** (*heroísmo*), representando a missão do personagem de salvar seu mundo.
-
-> Este README descreve a proposta do jogo. Algumas mecânicas e elementos visuais ainda podem estar em desenvolvimento e sujeitos a ajustes.
-
 ## 🎮 Jogabilidade
 
 A proposta parte de um jogo de tiro e acrescenta combate em múltiplas direções, progressão por salas e uma batalha final contra um chefe.
 
-- **Movimentação:** teclas `W`, `A`, `S` e `D`.
+- **Movimentação:** teclas `W`, `A`, `S`, `D`.
 - **Combate:** o personagem começa com uma espada e uma flecha.
 - **Flecha recuperável:** o jogador possui uma flecha principal que pode permanecer parada após ser lançada. Ao pressionar `Espaço`, pode chamá-la de volta, atingindo inimigos também no retorno.
 - **Direções de ataque:** possibilidade de disparar em mais de uma direção.
@@ -79,7 +75,3 @@ Projeto desenvolvido para a disciplina de **Programação Orientada a Objetos (P
 - Júlia Dutra Fernandes
 - Luis Felipe Torres Josue
 - Pedro Diogo Paiva de Lima
-
-## 💬 Nosso lema
-
-> “Para resolver um erro, é só tornar ele uma feature.”
