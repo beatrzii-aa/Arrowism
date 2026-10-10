@@ -2,31 +2,6 @@
 
 **Arrowism** é um minijogo em **Python com Pygame**, desenvolvido com **Programação Orientada a Objetos**, ambientado em um reino medieval invadido por alienígenas. Sobreviva a cinco salas com ondas de inimigos e enfrente o chefe na sexta sala.
 
-O jogo abre em uma **janela de 1024 × 768**, sem tela cheia. O tamanho está em `Códigos/configuracoes.py`.
-
-## ▶️ Como executar
-
-Use Python **3.11 a 3.13**. A implementação foi validada com Python 3.13 e Pygame 2.6.1.
-
-Na pasta do projeto:
-
-```bash
-python -m venv .venv
-```
-
-Ative o ambiente com `source .venv/bin/activate` no Linux/macOS ou `.venv\Scripts\Activate.ps1` no PowerShell. Depois:
-
-```bash
-python -m pip install -r requirements.txt
-python "Códigos/main.py"
-```
-
-Com o ambiente já existente neste projeto, também é possível executar diretamente:
-
-```bash
-.venv/bin/python "Códigos/main.py"
-```
-
 ## 🎮 Controles e combate
 
 | Ação | Controle |
